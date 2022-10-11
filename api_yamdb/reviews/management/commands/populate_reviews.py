@@ -1,3 +1,11 @@
+'''
+Script that populates database with csv file data through related model.
+Command uses --path as an argument.
+To run the script type in command line:
+python3 manage.py populate_reviews --path 'path_name'
+For example:
+python3 manage.py populate_reviews --path /Users/some_user/Dev/api_yamdb/api_yamdb/static/data/titles.csv
+'''
 import csv
 import os
 import string
