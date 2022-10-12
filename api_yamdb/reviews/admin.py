@@ -35,7 +35,6 @@ class AdminGenreInline(admin.TabularInline):
 
 class AdminTitle(admin.ModelAdmin):
     fields = ('name', 'category', 'year',)
-    readonly_fields = ('year',)
     inlines = (AdminGenreInline,)
     list_display = ('name', 'year', 'category', 'get_genres')
     search_fields = ('name', 'year', 'category__name', 'genre__name')

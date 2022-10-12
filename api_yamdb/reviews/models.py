@@ -1,5 +1,3 @@
-import datetime
-
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -70,10 +68,8 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField('Название произведения', max_length=100)
-    year = models.IntegerField(
-        'Год публикации',
-        default=datetime.date.today().year
-    )
+    year = models.IntegerField('Год публикации')
+    description = models.TextField()
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL,
         verbose_name='Категория',
@@ -95,7 +91,7 @@ class GenreTitle(models.Model):
     )
 
     class Meta:
-        verbose_name_plural = 'Жанры'
+        verbose_name_plural = 'Genres'
         constraints = [
             models.UniqueConstraint(
                 fields=['title_id', 'genre_id'],
