@@ -1,6 +1,22 @@
 from django.contrib import admin
+from .models import Category, Genre, GenreTitle, Title, User
 
-from .models import Category, Genre, GenreTitle, Title
+
+class AdminUser(admin.ModelAdmin):
+    model = User
+    list_display = (
+        'pk',
+        'username',
+        'email',
+        'first_name',
+        'last_name',
+        'bio',
+        'role',
+    )
+    list_editable = ('role',)
+    search_fields = ('username', 'email', 'first_name', 'last_name',)
+    list_filter = ('role',)
+    empty_value_display = '-пусто-'
 
 
 class AdminCategory(admin.ModelAdmin):
@@ -30,6 +46,7 @@ class AdminTitle(admin.ModelAdmin):
     get_genres.short_description = 'Жанр'
 
 
+admin.site.register(User, AdminUser)
 admin.site.register(Category, AdminCategory)
 admin.site.register(Genre, AdminGenre)
 admin.site.register(Title, AdminTitle)
