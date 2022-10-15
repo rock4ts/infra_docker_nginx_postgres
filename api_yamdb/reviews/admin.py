@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Genre, GenreTitle, Title, User, Review, Comment, ReviewComment
+from .models import Category, Genre, GenreTitle, Title, User, Review, Comment
 
 
 class AdminUser(admin.ModelAdmin):
@@ -46,27 +46,24 @@ class AdminTitle(admin.ModelAdmin):
 class AdminReview(admin.ModelAdmin):
     list_display = (
         'pk',
+        'title_id',
         'text',
         'author',
         'score',
     )
     list_editable = ('score',)
-    search_fields = ('text', 'author', 'score',)
+    search_fields = ('text', 'author', 'score','title_id',)
     list_filter = ('score',)
-
-class AdminCommentInline(admin.TabularInline):
-    model = ReviewComment
 
 class AdminComment(admin.ModelAdmin):
     list_display = (
         'pk',
         'text',
         'author',
-        'review_',
+        'review_id',
     )
-    list_editable = ('score',)
-    search_fields = ('text', 'author', 'score',)
-    list_filter = ('score',)
+    search_fields = ('text', 'author', 'review_id',)
+
 
 admin.site.register(User, AdminUser)
 admin.site.register(Category, AdminCategory)
