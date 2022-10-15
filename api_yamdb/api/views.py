@@ -1,5 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, filters
+from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
 
 from reviews.models import Category, Genre, Title
