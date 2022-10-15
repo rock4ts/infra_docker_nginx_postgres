@@ -104,14 +104,16 @@ class Review(models.Model):
     title_id = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name='reviews',
+        related_name='Reviews',
         verbose_name='Произведение'
     )
-    text = models.TextField()
+    text = models.TextField(
+        verbose_name='Текст отзыва'
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='reviews',
+        related_name='Reviews',
         verbose_name='Автор'
     )
     score = models.IntegerField(
@@ -130,24 +132,26 @@ class Review(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'title_id'],
-                name='unique review')
+                name='UniqueReviewComment')
         ]
-        verbose_name_plural = 'reviews'
+        verbose_name_plural = 'Reviews'
 
     def __str__(self):
-        return self.text
+        return self.text[:50]
 
 
 class Comment(models.Model):
     review_id = models.ForeignKey(
         Review, on_delete=models.CASCADE,
-        related_name='comments',
+        related_name='Comments',
         verbose_name='Отзыв'
     )
-    text = models.TextField(verbose_name='Текст')
+    text = models.TextField(
+        verbose_name='Текст отзыва'
+        )
     author = models.ForeignKey(
         User, on_delete=models.CASCADE,
-        related_name='comments',
+        related_name='Comments',
         verbose_name='Автор'
     )
     pub_date = models.DateTimeField(
@@ -156,7 +160,7 @@ class Comment(models.Model):
     )
 
     class Meta:
-        verbose_name_plural = 'comments'
+        verbose_name_plural = 'Сomments'
 
     def __str__(self):
-        return self.text
+        return self.text[:50]

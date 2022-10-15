@@ -44,24 +44,13 @@ class AdminTitle(admin.ModelAdmin):
     get_genres.short_description = 'Жанр'
 
 class AdminReview(admin.ModelAdmin):
-    list_display = (
-        'pk',
-        'title_id',
-        'text',
-        'author',
-        'score',
-    )
+    list_display = ('pk', 'title_id', 'text', 'author', 'score')
     list_editable = ('score',)
     search_fields = ('text', 'author', 'score','title_id',)
     list_filter = ('score',)
 
 class AdminComment(admin.ModelAdmin):
-    list_display = (
-        'pk',
-        'text',
-        'author',
-        'review_id',
-    )
+    list_display = ('pk', 'text', 'author', 'review_id')
     search_fields = ('text', 'author', 'review_id',)
 
 
