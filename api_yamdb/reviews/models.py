@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class User(AbstractUser):
@@ -100,15 +101,15 @@ class GenreTitle(models.Model):
         ]
 
 class Review(models.Model):
-    title = models.ForeignKey(
-        'Title',
+    title_id = models.ForeignKey(
+        Title,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Произведение'
     )
     text = models.TextField()
     author = models.ForeignKey(
-        'User',
+        User,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Автор'
@@ -128,25 +129,24 @@ class Review(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['author', 'title'],
+                fields=['author', 'title_id'],
                 name='unique review')
         ]
-        verbose_name = 'Отзыв'
-        verbose_name_plural = 'Отзывы'
+        verbose_name_plural = 'reviews'
 
     def __str__(self):
         return self.text
 
 
 class Comment(models.Model):
-    review = models.ForeignKey(
-        'Review', on_delete=models.CASCADE,
+    review_id = models.ForeignKey(
+        Review, on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Отзыв'
     )
     text = models.TextField(verbose_name='Текст')
     author = models.ForeignKey(
-        'User', on_delete=models.CASCADE,
+        User, on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор'
     )
@@ -156,10 +156,7 @@ class Comment(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Комментарий'
-        verbose_name_plural = 'Комментарии'
+        verbose_name_plural = 'comments'
 
     def __str__(self):
         return self.text
-
-
