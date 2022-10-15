@@ -163,8 +163,3 @@ class Comment(models.Model):
         return self.text
 
 
-ROLE_CHOICES = (
-    ('user', 'Пользователь'),
-    ('moderator', 'Модератор'),
-    ('admin', 'Администратор'),
-)
