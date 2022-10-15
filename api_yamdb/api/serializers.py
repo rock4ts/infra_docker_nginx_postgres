@@ -20,42 +20,39 @@ class GenreSerializer(serializers.ModelSerializer):
         fields = ('name', 'slug',)
 
 
-class GenreSlugSerializer(serializers.ModelSerializer):
-    slug = serializers.SlugField()
+class GetTitleSerializer(serializers.ModelSerializer):
+    genre = GenreSerializer(many=True)
+    category = CategorySerializer()
 
     class Meta:
-        model = Genre
-        fields = ('slug',)
+        model = Title
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category',)
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    category = SlugRelatedField(slug_field='slug', read_only=True)
-    genre = GenreSerializer(many=True)
+    genre = SlugRelatedField(
+        slug_field='slug', many=True, queryset=Genre.objects.all()
+    )
+    category = SlugRelatedField(
+        slug_field='slug', queryset=Category.objects.all()
+    )
 
     class Meta:
         model = Title
-        fields = ('name', 'year', 'description', 'genre', 'category',)
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category',)
 
-
-class PostTitleSerializer(serializers.ModelSerializer):
-    category = SlugRelatedField(slug_field='slug', read_only=True)
-    genre = GenreSlugSerializer(many=True)
-
-    class Meta:
-        model = Title
-        fields = '__all__'
-    
     def validate(self, data):
         if datetime.date.today().year < data['year']:
             raise serializers.ValidationError(
                 'Publication year can not be later then current year!'
             )
+        return data
 
     def create(self, validated_data):
         genres = validated_data.pop('genre')
         title = Title.objects.create(**validated_data)
         for genre in genres:
-            current_genre = Genre.objects.get(slug=genre)
+            current_genre = genre
             GenreTitle.objects.create(
                 genre_id=current_genre, title_id=title
             )
@@ -72,23 +69,9 @@ class PostTitleSerializer(serializers.ModelSerializer):
             genres = validated_data.pop('genre')
             lst = []
             for genre in genres:
-                current_genre, status = Genre.objects.get_or_create(**genre)
+                current_genre = genre
                 lst.append(current_genre)
             instance.genre.set(lst)
 
         instance.save()
         return instance
-
-
-'''
-def to_internal_value(self, data):
-        genres = data.get('genre')
-        if genres:
-            data['genre'] = []
-            for genre in genres:
-                
-                data['genre'].append()
-            data['genre'] = [{'slug': genre} for genre in genres]
-        ret = super().to_internal_value(data)
-        return ret
-'''
