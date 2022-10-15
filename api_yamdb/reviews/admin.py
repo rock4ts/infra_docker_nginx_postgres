@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Genre, GenreTitle, Title, User
+from .models import Category, Genre, GenreTitle, Title, User, Review, Comment, ReviewComment
 
 
 class AdminUser(admin.ModelAdmin):
@@ -32,7 +32,6 @@ class AdminGenre(admin.ModelAdmin):
 class AdminGenreInline(admin.TabularInline):
     model = GenreTitle
 
-
 class AdminTitle(admin.ModelAdmin):
     fields = ('name', 'category', 'year',)
     inlines = (AdminGenreInline,)
@@ -44,8 +43,34 @@ class AdminTitle(admin.ModelAdmin):
         return [genre.genre_id for genre in obj.genres.all()]
     get_genres.short_description = 'Жанр'
 
+class AdminReview(admin.ModelAdmin):
+    list_display = (
+        'pk',
+        'text',
+        'author',
+        'score',
+    )
+    list_editable = ('score',)
+    search_fields = ('text', 'author', 'score',)
+    list_filter = ('score',)
+
+class AdminCommentInline(admin.TabularInline):
+    model = ReviewComment
+
+class AdminComment(admin.ModelAdmin):
+    list_display = (
+        'pk',
+        'text',
+        'author',
+        'review_',
+    )
+    list_editable = ('score',)
+    search_fields = ('text', 'author', 'score',)
+    list_filter = ('score',)
 
 admin.site.register(User, AdminUser)
 admin.site.register(Category, AdminCategory)
 admin.site.register(Genre, AdminGenre)
 admin.site.register(Title, AdminTitle)
+admin.site.register(Review, AdminReview)
+admin.site.register(Comment, AdminComment)
