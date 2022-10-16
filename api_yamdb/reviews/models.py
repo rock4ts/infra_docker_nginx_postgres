@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class User(AbstractUser):
@@ -90,6 +91,69 @@ class GenreTitle(models.Model):
                 name='unique_constraint_fail',
             ),
         ]
+        
+
+class Review(models.Model):
+    title_id = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name='Произведение'
+    )
+    text = models.TextField(
+        verbose_name='Текст отзыва'
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name='Автор'
+    )
+    score = models.IntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(10)
+        ],
+        verbose_name='Оценка'
+    )
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата публикации'
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title_id'],
+                name='UniqueReviewComment')
+        ]
+        verbose_name_plural = 'Reviews'
 
     def __str__(self):
-        return ''
+        return self.text[:50]
+
+
+class Comment(models.Model):
+    review_id = models.ForeignKey(
+        Review, on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Отзыв'
+    )
+    text = models.TextField(
+        verbose_name='Текст комментария'
+        )
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Автор'
+    )
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата публикации'
+    )
+
+    class Meta:
+        verbose_name_plural = 'Сomments'
+
+    def __str__(self):
+        return self.text
