@@ -91,7 +91,7 @@ class GenreTitle(models.Model):
                 name='unique_constraint_fail',
             ),
         ]
-        
+
 
 class Review(models.Model):
     title_id = models.ForeignKey(
@@ -100,9 +100,7 @@ class Review(models.Model):
         related_name='reviews',
         verbose_name='Произведение'
     )
-    text = models.TextField(
-        verbose_name='Текст отзыва'
-    )
+    text = models.TextField('Текст отзыва')
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -122,12 +120,12 @@ class Review(models.Model):
     )
 
     class Meta:
+        verbose_name_plural = 'Reviews'
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'title_id'],
                 name='UniqueReviewComment')
         ]
-        verbose_name_plural = 'Reviews'
 
     def __str__(self):
         return self.text[:50]
@@ -139,9 +137,7 @@ class Comment(models.Model):
         related_name='comments',
         verbose_name='Отзыв'
     )
-    text = models.TextField(
-        verbose_name='Текст комментария'
-        )
+    text = models.TextField('Текст комментария')
     author = models.ForeignKey(
         User, on_delete=models.CASCADE,
         related_name='comments',
