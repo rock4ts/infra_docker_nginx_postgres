@@ -12,33 +12,22 @@ class User(AbstractUser):
     )
 
     username = models.CharField(
-        unique=True,
-        max_length=150,
-        verbose_name='Имя пользователя'
+        unique=True, max_length=150, verbose_name='Имя пользователя'
     )
     email = models.EmailField(
-        unique=True,
-        verbose_name='Электронная почта'
+        unique=True, verbose_name='Электронная почта'
     )
     first_name = models.CharField(
-        max_length=150,
-        blank=True,
-        verbose_name='Имя',
+        max_length=150, blank=True, verbose_name='Имя',
     )
     last_name = models.CharField(
-        max_length=150,
-        blank=True,
-        verbose_name='Фамилия'
+        max_length=150, blank=True, verbose_name='Фамилия'
     )
     bio = models.TextField(
-        blank=True,
-        verbose_name='О себе'
+        blank=True, verbose_name='О себе'
     )
     role = models.CharField(
-        max_length=50,
-        choices=USERS_ROLES,
-        default='user',
-        verbose_name='Роль'
+        max_length=50, choices=USERS_ROLES, default='user', verbose_name='Роль'
     )
 
     class Meta:
@@ -49,8 +38,8 @@ class User(AbstractUser):
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=256)
+    slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
         verbose_name_plural = 'Categories'
@@ -60,8 +49,8 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=256)
+    slug = models.SlugField(max_length=50, unique=True)
 
     def __str__(self):
         return self.name
@@ -70,7 +59,7 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.CharField('Название произведения', max_length=100)
     year = models.IntegerField('Год публикации')
-    description = models.TextField()
+    description = models.TextField(blank=True)
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL,
         verbose_name='Категория',
@@ -80,15 +69,18 @@ class Title(models.Model):
         Genre, through='GenreTitle', verbose_name='Жанр'
     )
 
+    def __str__(self):
+        return self.name
+
 
 class GenreTitle(models.Model):
     title_id = models.ForeignKey(
         Title, on_delete=models.CASCADE,
-        related_name='genres', verbose_name=''
+        related_name='genres', verbose_name='Произведение'
     )
     genre_id = models.ForeignKey(
         Genre, on_delete=models.CASCADE,
-        related_name='titles', verbose_name=''
+        related_name='titles', verbose_name='Жанр'
     )
 
     class Meta:
@@ -99,6 +91,7 @@ class GenreTitle(models.Model):
                 name='unique_constraint_fail',
             ),
         ]
+        
 
 class Review(models.Model):
     title_id = models.ForeignKey(
@@ -163,4 +156,4 @@ class Comment(models.Model):
         verbose_name_plural = 'Сomments'
 
     def __str__(self):
-        return self.text[:50]
+        return self.text
