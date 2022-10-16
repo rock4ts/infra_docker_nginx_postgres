@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.models import User
 from rest_framework import viewsets
-from .permissions import IsAdminOrSuperuser
+from .permissions import IsRoleAdminOrSuperuser
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -23,7 +23,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """viewset для работы с пользователями."""
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAdminOrSuperuser,)
+    permission_classes = (IsRoleAdminOrSuperuser,)
     pagination_class = PageNumberPagination
     lookup_field = "username"
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
