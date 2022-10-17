@@ -45,7 +45,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class signup(APIView):
+class Signup(APIView):
     """
     Регистрирует нового пользователя по username и email.
     Присылает на email confirmation_code.
@@ -71,7 +71,7 @@ class signup(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class token(APIView):
+class Token(APIView):
     """Выдаёт токен по username и confirmation_code"""
     permission_classes = (AllowAny,)
 
