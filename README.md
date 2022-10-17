@@ -6,7 +6,6 @@
 Добавлять произведения, категории и жанры может только администратор.
 Благодарные или возмущённые пользователи оставляют к произведениям текстовые отзывы и ставят произведению оценку в диапазоне от одного до десяти (целое число); из пользовательских оценок формируется усреднённая оценка произведения — рейтинг (целое число). На одно произведение пользователь может оставить только один отзыв.
 Добавлять отзывы, комментарии и ставить оценки могут только аутентифицированные пользователи.
-<br></br>
 
 ## Технологии
 python 3.7
@@ -17,37 +16,43 @@ djangorestframework-simplejwt 5.2.1
 
 ### Клонировать репозиторий и перейти в него в командной строке:
 
-```git clone git@github.com:rock4ts/api_yamdb.git
+```
+git clone git@github.com:rock4ts/api_yamdb.git
 
 cd api_yambd
 ```
 
 ### Cоздать и активировать виртуальное окружение:
 
-```py -3.7 -m venv venv
+```
+py -3.7 -m venv venv
 
 source venv/Scripts/activate
 ```
 ### Обновить pip и установить зависимости из файла requirements.txt:
 
-```python -m pip install --upgrade pip
+```
+python -m pip install --upgrade pip
 
 pip install -r requirements.txt
 ```
 ### Перейти в директорию, в которой расположен файл manage.py
 
-```cd api__yambd
+```
+cd api__yambd
 ```
 
 ### Выполнить миграции:
 
-```python manage.py makemigrations
+```
+python manage.py makemigrations
 
 python manage.py migrate
 ```
 ### Запустить проект:
 
-```python manage.py runserver
+```
+python manage.py runserver
 ```
 ## Ресурсы API YaMDb
 - Ресурс auth: аутентификация.
