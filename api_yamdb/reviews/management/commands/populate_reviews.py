@@ -12,9 +12,8 @@ import string
 
 import inflect
 from django.apps import apps
-from django.db.models import ForeignKey
 from django.core.management.base import BaseCommand, CommandError
-
+from django.db.models import ForeignKey
 
 
 class Command(BaseCommand):
