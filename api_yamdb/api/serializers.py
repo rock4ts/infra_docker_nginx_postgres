@@ -25,7 +25,6 @@ class TokenSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     """Сериализатор для работы с пользователями."""
 
-    # cats = serializers.StringRelatedField(many=True, read_only=True)
     class Meta:
         model = User
         fields = (
