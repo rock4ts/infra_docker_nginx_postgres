@@ -39,6 +39,7 @@ class TitleViewSet(viewsets.ModelViewSet):
             return GetTitleSerializer
         return TitleSerializer
 
+
 class ReviewViewSet(viewsets.ModelViewSet):
     """
     Admin, Moderator can manage reviews
