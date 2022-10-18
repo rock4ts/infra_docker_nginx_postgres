@@ -3,10 +3,7 @@ from rest_framework import permissions
 
 class IsAdminOrSuperUser(permissions.BasePermission):
     """
-    Суперюзер Django.
-    Обладает правами администратора, пользователя с правами admin.
-    Даже если изменить пользовательскую роль суперюзера — это не лишит
-    его прав администратора.
+    Класс доступа Суперюзера и Админов к управлению контентом проекта.
     """
     def has_permission(self, request, view):
         return (
