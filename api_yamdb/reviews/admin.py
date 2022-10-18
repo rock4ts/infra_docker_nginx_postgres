@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Comment, Genre, GenreTitle, Title, User, Review
-
+from .models import Category, Comment, Genre, GenreTitle, Review, Title, User
 
 
 class AdminUser(admin.ModelAdmin):
@@ -12,7 +11,6 @@ class AdminUser(admin.ModelAdmin):
     list_editable = ('role',)
     search_fields = ('username', 'email', 'first_name', 'last_name',)
     list_filter = ('role',)
-    ordering = ('pk',)
     empty_value_display = '-пусто-'
 
 
@@ -36,7 +34,6 @@ class AdminTitle(admin.ModelAdmin):
     list_display = ('pk', 'name', 'year', 'category', 'get_genres',)
     search_fields = ('pk', 'name', 'year', 'category__name', 'genre__name',)
     list_filter = ('category', 'genre',)
-    ordering = ('pk',)
 
     def get_genres(self, obj):
         return [genre.genre_id for genre in obj.genres.all()]
@@ -46,15 +43,13 @@ class AdminTitle(admin.ModelAdmin):
 class AdminReview(admin.ModelAdmin):
     list_display = ('pk', 'title_id', 'text', 'author', 'score',)
     list_editable = ('score',)
-    search_fields = ('text', 'author', 'score','title_id',)
+    search_fields = ('text', 'author', 'score', 'title_id',)
     list_filter = ('score',)
-    ordering = ('pk',)
 
 
 class AdminComment(admin.ModelAdmin):
     list_display = ('pk', 'review_id', 'text', 'author',)
     search_fields = ('text', 'author', 'review_id',)
-    ordering = ('pk',)
 
 
 admin.site.register(User, AdminUser)

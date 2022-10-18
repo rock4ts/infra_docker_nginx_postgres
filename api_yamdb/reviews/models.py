@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import (MaxValueValidator, MinValueValidator,
+                                    RegexValidator)
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class User(AbstractUser):
@@ -12,7 +13,16 @@ class User(AbstractUser):
     )
 
     username = models.CharField(
-        unique=True, max_length=150, verbose_name='Имя пользователя'
+        unique=True, max_length=150, verbose_name='Имя пользователя',
+        validators=[
+            RegexValidator(
+                regex=r'^[\w.@+-]+$',
+                message=(
+                    'Username may only consist of letters,',
+                    'digits and @/./+/-/_'
+                ),
+            ),
+        ]
     )
     email = models.EmailField(
         unique=True, verbose_name='Электронная почта'
@@ -74,11 +84,11 @@ class Title(models.Model):
 
 
 class GenreTitle(models.Model):
-    title_id = models.ForeignKey(
+    title = models.ForeignKey(
         Title, on_delete=models.CASCADE,
         related_name='genres', verbose_name='Произведение'
     )
-    genre_id = models.ForeignKey(
+    genre = models.ForeignKey(
         Genre, on_delete=models.CASCADE,
         related_name='titles', verbose_name='Жанр'
     )
@@ -87,14 +97,14 @@ class GenreTitle(models.Model):
         verbose_name_plural = 'Genres'
         constraints = [
             models.UniqueConstraint(
-                fields=['title_id', 'genre_id'],
+                fields=['title', 'genre'],
                 name='unique_constraint_fail',
             ),
         ]
 
 
 class Review(models.Model):
-    title_id = models.ForeignKey(
+    title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
         related_name='reviews',
@@ -123,8 +133,8 @@ class Review(models.Model):
         verbose_name_plural = 'Reviews'
         constraints = [
             models.UniqueConstraint(
-                fields=['author', 'title_id'],
-                name='UniqueReviewComment')
+                fields=['author', 'title'],
+                name='unique_review_constaint')
         ]
 
     def __str__(self):
@@ -132,7 +142,7 @@ class Review(models.Model):
 
 
 class Comment(models.Model):
-    review_id = models.ForeignKey(
+    review = models.ForeignKey(
         Review, on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Отзыв'

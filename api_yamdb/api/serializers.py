@@ -4,14 +4,14 @@ from django.db.models import Avg
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
-from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title, User
+from reviews.models import (Category, Comment, Genre, GenreTitle, Review,
+                            Title, User)
 
 
-class SignupSerializer(serializers.ModelSerializer):
+class SignupSerializer(serializers.Serializer):
     """Сериализатор для запроса кода подтверждения"""
-    class Meta:
-        model = User
-        fields = ('username', 'email',)
+    email = serializers.EmailField(required=True)
+    username = serializers.CharField(required=True)
 
     def validate_username(self, value):
         if value == 'me':
@@ -19,6 +19,21 @@ class SignupSerializer(serializers.ModelSerializer):
                 'Использовать имя "me" в качестве username запрещено.'
             )
         return value
+
+    def validate(self, data):
+        username = data.get('username')
+        email = data.get('email')
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError(
+                f'Username {username} занят, выберите другой имя пользователя.'
+            )
+        if (
+            User.objects.filter(email=email).exists()
+        ):
+            raise serializers.ValidationError(
+                f'{email} уже зарегистрирован, введите другой email.'
+            )
+        return data
 
 
 class TokenSerializer(serializers.Serializer):
@@ -51,7 +66,7 @@ class UserPatchMeSerializer(UserSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Category
         fields = ('name', 'slug',)
@@ -93,12 +108,12 @@ class TitleSerializer(serializers.ModelSerializer):
         model = Title
         fields = ('id', 'name', 'year', 'description', 'genre', 'category',)
 
-    def validate(self, data):
-        if datetime.date.today().year < data['year']:
+    def validate_year(self, value):
+        if datetime.date.today().year < value:
             raise serializers.ValidationError(
-                'Publication year can not be later then current year!'
+                'Год публикации не может быть позднее текущего года.'
             )
-        return data
+        return value
 
     def create(self, validated_data):
         genres = validated_data.pop('genre')
@@ -106,7 +121,7 @@ class TitleSerializer(serializers.ModelSerializer):
         for genre in genres:
             current_genre = genre
             GenreTitle.objects.create(
-                genre_id=current_genre, title_id=title
+                genre=current_genre, title=title
             )
         return title
 
@@ -149,11 +164,12 @@ class ReviewSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if self.context['request'].method != 'POST':
             return data
-
-        title_id = self.context['view'].kwargs.get('title_id')
+        title = self.context['view'].kwargs.get('title_id')
         author = self.context['request'].user
-        if Review.objects.filter(
-                author=author, title=title_id).exists():
+        second_review = (
+            Review.objects.filter(author=author, title=title).exists()
+        )
+        if second_review:
             raise serializers.ValidationError(
                 'Вы уже написали отзыв к этому произведению.'
             )

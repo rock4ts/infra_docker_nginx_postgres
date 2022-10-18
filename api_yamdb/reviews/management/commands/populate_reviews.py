@@ -1,10 +1,10 @@
 '''
-Script that populates database with csv file data through related model.
+Script uses file name to fetch model and populates it with data.
 Command uses --path as an argument.
 To run the script type in command line:
 python3 manage.py populate_reviews --path 'path_name'
 For example:
-python3 manage.py populate_reviews --path /Users/some_user/Dev/api_yamdb/api_yamdb/static/data/titles.csv
+python3 manage.py populate_reviews --path .../static/data/titles.csv
 '''
 import csv
 import os
@@ -26,20 +26,19 @@ class Command(BaseCommand):
         path = kwargs['path']
         model_name, type = os.path.splitext(os.path.basename(path))
         p = inflect.engine()
-        check_plural = p.singular_noun(model_name)
+        to_singular = p.singular_noun(model_name)
 
-        if not check_plural:
+        if not to_singular:
             model_name = string.capwords(model_name, '_').replace('_', '')
         else:
-            model_name = check_plural
-            model_name = string.capwords(model_name, '_').replace('_', '')
+            model_name = string.capwords(to_singular, '_').replace('_', '')
 
         try:
-            model = apps.get_model('reviews', model_name)
-        except LookupError as e:
+            Model = apps.get_model('reviews', model_name)
+        except LookupError:
             raise CommandError(f"{model_name} model does not exist")
-        
-        model_fields = [field.name for field in model._meta.fields]
+
+        model_fields = [field.name for field in Model._meta.fields]
         file_fields = []
 
         with open(path, 'rt') as file:
@@ -49,21 +48,22 @@ class Command(BaseCommand):
             for i in range(len(file_fields)):
                 file_fields[i] = file_fields[i].lower()
                 file_fields[i] = file_fields[i].replace(' ', '_')
+                file_fields[i] = file_fields[i].replace('_id', '')
                 if not file_fields[i] in model_fields:
                     raise CommandError(
-                        f"{model.__name__} model"
+                        f"{Model.__name__} model"
                         f" does not have {file_fields[i]} field"
                     )
 
             for row in reader:
-                obj = model()
-                for i, field in enumerate(row):
+                obj = Model()
+                for i, field_value in enumerate(row):
                     model_field = obj._meta.get_field(file_fields[i])
                     if isinstance(model_field, ForeignKey):
-                        field = model_field.related_model.objects.get(
-                            pk=int(field)
+                        field_value = model_field.related_model.objects.get(
+                            pk=int(field_value)
                         )
-                        setattr(obj, file_fields[i], field)
+                        setattr(obj, file_fields[i], field_value)
                     else:
-                        setattr(obj, file_fields[i], field)
+                        setattr(obj, file_fields[i], field_value)
                 obj.save()
