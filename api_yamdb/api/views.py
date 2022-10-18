@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api_yamdb.settings import admin_methods, moderator_methods
+from api_yamdb.settings import admin_methods, ADMINS_EMAIL, moderator_methods
 from reviews.models import Category, Genre, Review, Title, User
 from .filters import TitleFilter
 from .permissions import IsAdminOrSuperUser, IsModeratorOrAdminOrOwner
@@ -62,14 +62,14 @@ class SignUpView(APIView):
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        username = serializer.data['username']
-        email = serializer.data['email']
+        username = serializer.validated_data['username']
+        email = serializer.validated_data['email']
         user, _ = User.objects.get_or_create(email=email, username=username)
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
             subject='confirmation code for get token',
             message=f'Your confirmation code: "{confirmation_code}"',
-            from_email='from@api_yamdb.com',
+            from_email=ADMINS_EMAIL,
             recipient_list=[email],
             fail_silently=False,
         )
@@ -83,10 +83,10 @@ class TokenView(APIView):
     def post(self, request):
         serializer = TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        username = serializer.data['username']
+        username = serializer.validated_data['username']
         user = get_object_or_404(User, username=username)
         if not default_token_generator.check_token(
-            user, serializer.data['confirmation_code']
+            user, serializer.validated_data['confirmation_code']
         ):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         token = str(RefreshToken.for_user(user).access_token)

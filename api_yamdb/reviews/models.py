@@ -5,12 +5,14 @@ from django.db import models
 
 
 class User(AbstractUser):
-
-    USERS_ROLES = (
-        ('user', 'Пользователь'),
-        ('moderator', 'Модератор'),
-        ('admin', 'Администратор'),
-    )
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
+    USERS_ROLES = [
+        (USER, 'Пользователь'),
+        (MODERATOR, 'Модератор'),
+        (ADMIN, 'Администратор'),
+    ]
 
     username = models.CharField(
         unique=True, max_length=150, verbose_name='Имя пользователя',
@@ -18,7 +20,7 @@ class User(AbstractUser):
             RegexValidator(
                 regex=r'^[\w.@+-]+$',
                 message=(
-                    'Username may only consist of letters,',
+                    'Username may only consists of letters,',
                     'digits and @/./+/-/_'
                 ),
             ),
@@ -45,6 +47,18 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    @property
+    def is_user(self):
+        return self.role == 'user'
+
+    @property
+    def is_moderator(self):
+        return self.role == 'moderator'
+
+    @property
+    def is_admin(self):
+        return self.role == 'admin'
 
 
 class Category(models.Model):
