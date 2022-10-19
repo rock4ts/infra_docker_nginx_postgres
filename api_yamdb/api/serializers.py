@@ -1,6 +1,3 @@
-import datetime
-
-from django.db.models import Avg
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
@@ -69,31 +66,26 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('name', 'slug',)
+        exclude = ('id',)
 
 
 class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        fields = ('name', 'slug',)
+        exclude = ('id',)
 
 
 class GetTitleSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
-    rating = serializers.SerializerMethodField()
+    rating = serializers.FloatField()
 
     class Meta:
         model = Title
         fields = (
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category',
         )
-
-    def get_rating(self, obj):
-        title_reviews = Review.objects.filter(title_id=obj.pk)
-        avg_rating = title_reviews.aggregate(Avg('score'))['score__avg']
-        return avg_rating
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -107,41 +99,6 @@ class TitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'description', 'genre', 'category',)
-
-    def validate_year(self, value):
-        if datetime.date.today().year < value:
-            raise serializers.ValidationError(
-                'Год публикации не может быть позднее текущего года.'
-            )
-        return value
-
-    def create(self, validated_data):
-        genres = validated_data.pop('genre')
-        title = Title.objects.create(**validated_data)
-        for genre in genres:
-            current_genre = genre
-            GenreTitle.objects.create(
-                genre=current_genre, title=title
-            )
-        return title
-
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.year = validated_data.get('year', instance.year)
-        instance.description = validated_data.get(
-            'description', instance.description
-        )
-        instance.category = validated_data.get('category', instance.category)
-        if 'genre' in validated_data:
-            genres = validated_data.pop('genre')
-            lst = []
-            for genre in genres:
-                current_genre = genre
-                lst.append(current_genre)
-            instance.genre.set(lst)
-
-        instance.save()
-        return instance
 
 
 class ReviewSerializer(serializers.ModelSerializer):
