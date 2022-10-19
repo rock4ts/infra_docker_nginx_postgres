@@ -1,25 +1,15 @@
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
-from reviews.models import (Category, Comment, Genre, GenreTitle, Review,
-                            Title, User)
-
-
-def validate_username(username):
-    """Проверка, что username не равно me"""
-
-    if username in ('ME', 'me', 'Me', 'mE'):
-        raise serializers.ValidationError(
-            'Недопустимые имена: ME, me, Me, mE.'
-        )
-    return username
+from reviews.models import Category, Comment, Genre, Review, Title, User
+from reviews.validators import username_validator
 
 
 class SignupSerializer(serializers.Serializer):
     """Сериализатор для запроса кода подтверждения"""
     email = serializers.EmailField(required=True)
     username = serializers.CharField(
-        required=True, validators=[validate_username]
+        required=True, validators=[username_validator]
     )
 
     def validate(self, data):
@@ -29,9 +19,7 @@ class SignupSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 f'Username {username} занят, выберите другой имя пользователя.'
             )
-        if (
-            User.objects.filter(email=email).exists()
-        ):
+        elif User.objects.filter(email=email).exists():
             raise serializers.ValidationError(
                 f'{email} уже зарегистрирован, введите другой email.'
             )
@@ -41,7 +29,7 @@ class SignupSerializer(serializers.Serializer):
 class TokenSerializer(serializers.Serializer):
     """Сериалайзер для запроса токена."""
     username = serializers.CharField(
-        max_length=150, required=True, validators=[validate_username]
+        max_length=150, required=True, validators=[username_validator]
     )
     confirmation_code = serializers.CharField(max_length=255, required=True)
 
@@ -110,13 +98,6 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
-
-    def validate_score(self, value):
-        if not 1 <= value <= 10:
-            raise serializers.ValidationError(
-                'Оценкой может быть целое число в диапазоне от 1 до 10.'
-            )
-        return value
 
     def validate(self, data):
         if self.context['request'].method != 'POST':

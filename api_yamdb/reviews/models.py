@@ -1,10 +1,8 @@
-from tabnanny import verbose
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import (MaxValueValidator, MinValueValidator,
-                                    RegexValidator)
+from django.core.validators import RegexValidator
 from django.db import models
 
-from .validators import year_validator
+from .validators import score_validator, username_validator, year_validator
 
 
 class User(AbstractUser):
@@ -23,10 +21,11 @@ class User(AbstractUser):
             RegexValidator(
                 regex=r'^[\w.@+-]+$',
                 message=(
-                    'Username may only consists of letters,',
+                    'Username may only consist of letters,',
                     'digits and @/./+/-/_'
                 ),
             ),
+            username_validator,
         ]
     )
     email = models.EmailField(
@@ -46,6 +45,7 @@ class User(AbstractUser):
     )
 
     class Meta:
+        verbose_name = 'User'
         verbose_name_plural = 'Users'
 
     def __str__(self):
@@ -53,15 +53,15 @@ class User(AbstractUser):
 
     @property
     def is_user(self):
-        return self.role == 'user'
+        return self.role == self.USER
 
     @property
     def is_moderator(self):
-        return self.role == 'moderator'
+        return self.role == self.MODERATOR
 
     @property
     def is_admin(self):
-        return self.role == 'admin'
+        return self.role == self.ADMIN
 
 
 class Category(models.Model):
@@ -99,9 +99,9 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.CharField(
         max_length=100, verbose_name='Название произведения'
-        )
+    )
     year = models.IntegerField(
-        validators=[year_validator,],
+        validators=[year_validator],
         verbose_name='Год публикации'
     )
     description = models.TextField(
@@ -161,10 +161,7 @@ class Review(models.Model):
         verbose_name='Автор'
     )
     score = models.IntegerField(
-        validators=[
-            MinValueValidator(1, "Оценка не может быть ниже '1'."),
-            MaxValueValidator(10, "Оценка не может быть выше '10'.")
-        ],
+        validators=[score_validator],
         verbose_name='Оценка'
     )
     pub_date = models.DateTimeField(
