@@ -1,4 +1,3 @@
-'''Custom viewset mixins'''
 from rest_framework import viewsets
 
 from api_yamdb.settings import admin_methods, moderator_methods
@@ -6,10 +5,10 @@ from .permissions import IsAdminOrSuperUser, IsModeratorOrAdminOrOwner
 
 
 class AdminViewMixin(viewsets.GenericViewSet):
-    '''
+    """
     Generic viewset class that sets Admin level restrictions for
     'POST', 'PATCH', 'PUT' and 'DELETE' methods.
-    '''
+    """
 
     restricted_methods = admin_methods
     permission_level_class = IsAdminOrSuperUser
@@ -21,10 +20,10 @@ class AdminViewMixin(viewsets.GenericViewSet):
 
 
 class ModeratorViewMixin(AdminViewMixin):
-    '''
-    Generic viewset class that sets Moderator level restrictions for
+    """
+    Generic viewset class that sets Moderator/Owner level restrictions for
     'PATCH', 'PUT' and 'DELETE' methods.
-    '''
+    """
 
     restricted_methods = moderator_methods
     permission_level_class = IsModeratorOrAdminOrOwner

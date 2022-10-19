@@ -1,10 +1,15 @@
 '''
-Script uses file name to fetch model and populates it with data.
-Command uses --path as an argument.
-To run the script type in command line:
-python3 manage.py populate_reviews --path 'path_name'
-For example:
-python3 manage.py populate_reviews --path .../static/data/titles.csv
+Command to populate database with csv file data.
+
+Script accepts file address, performs a check-up on file name,
+automatically fetches relevant model by its name
+and populates projects database with csv file data.
+
+For script execution in the command line type:
+
+python3 manage.py populate_reviews --path <path_name>
+
+* <path_name> should end with csv file name
 '''
 import csv
 import os
@@ -17,7 +22,7 @@ from django.db.models import ForeignKey
 
 
 class Command(BaseCommand):
-    help = 'Populates database with specified model data'
+    help = "Populates database with specified model data"
 
     def add_arguments(self, parser):
         parser.add_argument('--path', type=str)

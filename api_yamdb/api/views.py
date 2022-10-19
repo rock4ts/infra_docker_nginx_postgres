@@ -56,8 +56,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class SignUpView(APIView):
     """
-    Регистрирует нового пользователя по username и email.
-    Присылает на email confirmation_code.
+    Extends APIView class by defining user registration function.
+    Emply to register user and send confirmation code to email.
     """
     permission_classes = (AllowAny,)
 
@@ -79,7 +79,10 @@ class SignUpView(APIView):
 
 
 class TokenView(SignUpView):
-    """Выдаёт токен по username и confirmation_code"""
+    """
+    Defines function that uses username and confirmation_code parameters 
+    and returns user token.
+    """
 
     def post(self, request):
         serializer = TokenSerializer(data=request.data)

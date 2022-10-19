@@ -1,4 +1,3 @@
-'''Custom model field validators'''
 from django.forms import ValidationError
 from django.utils import timezone
 
@@ -20,7 +19,9 @@ def score_validator(score):
 
 
 def username_validator(username):
-    """Проверка, что username не равно me"""
+    """
+    Validates that username not equal to sting 'me'
+    """
     if username.lower() == 'me':
         raise ValidationError(
             f"Недопустимое имя пользователя: {username}."

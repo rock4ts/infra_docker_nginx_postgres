@@ -3,7 +3,7 @@ from rest_framework import permissions
 
 class IsAdminOrSuperUser(permissions.BasePermission):
     """
-    Класс доступа Суперюзера и Админов к управлению контентом проекта.
+    Grants permission to manage data to SuperUser and Admin users.
     """
     def has_permission(self, request, view):
         return (
@@ -14,10 +14,8 @@ class IsAdminOrSuperUser(permissions.BasePermission):
 
 class IsModeratorOrAdminOrOwner(permissions.BasePermission):
     """
-    Класс, позволяющий Админам и Модераторам
-    удалять и редактировать любые отзывы и комментариии,
-    a также Авторам отзыва или комментария
-    удалять и редактировать собственные отзывы и комментариии.
+    Grants permission to manage individual data
+    to data owner, SuperUser, Admin and Moderator users.
     """
 
     def has_object_permission(self, request, view, obj):

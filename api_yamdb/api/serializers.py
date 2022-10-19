@@ -6,7 +6,9 @@ from reviews.validators import username_validator
 
 
 class SignupSerializer(serializers.Serializer):
-    """Сериализатор для запроса кода подтверждения"""
+    """
+    User registration serializer.
+    """
     email = serializers.EmailField(required=True)
     username = serializers.CharField(
         required=True, validators=[username_validator]
@@ -27,7 +29,9 @@ class SignupSerializer(serializers.Serializer):
 
 
 class TokenSerializer(serializers.Serializer):
-    """Сериалайзер для запроса токена."""
+    """
+    Token request serializer.
+    """
     username = serializers.CharField(
         max_length=150, required=True, validators=[username_validator]
     )
@@ -35,7 +39,9 @@ class TokenSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Сериализатор для работы с пользователями."""
+    """
+    User data serializer.
+    """
 
     class Meta:
         model = User
@@ -45,7 +51,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserPatchMeSerializer(UserSerializer):
-    """Сериализатор для работы со своим профилем."""
+    """
+    User self data serializer.
+    """
     class Meta(UserSerializer.Meta):
         read_only_fields = ('role',)
 
@@ -65,6 +73,9 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class GetTitleSerializer(serializers.ModelSerializer):
+    """
+    Title serializer for GET requests
+    """
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
     rating = serializers.FloatField()
@@ -77,6 +88,9 @@ class GetTitleSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    """
+    Title serializer for POST requests
+    """
     genre = SlugRelatedField(
         slug_field='slug', many=True, queryset=Genre.objects.all()
     )
