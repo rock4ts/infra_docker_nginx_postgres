@@ -5,17 +5,22 @@ from reviews.models import (Category, Comment, Genre, GenreTitle, Review,
                             Title, User)
 
 
+def validate_username(username):
+    """Проверка, что username не равно me"""
+
+    if username in ('ME', 'me', 'Me', 'mE'):
+        raise serializers.ValidationError(
+            'Недопустимые имена: ME, me, Me, mE.'
+        )
+    return username
+
+
 class SignupSerializer(serializers.Serializer):
     """Сериализатор для запроса кода подтверждения"""
     email = serializers.EmailField(required=True)
-    username = serializers.CharField(required=True)
-
-    def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError(
-                'Использовать имя "me" в качестве username запрещено.'
-            )
-        return value
+    username = serializers.CharField(
+        required=True, validators=[validate_username]
+    )
 
     def validate(self, data):
         username = data.get('username')
@@ -35,7 +40,9 @@ class SignupSerializer(serializers.Serializer):
 
 class TokenSerializer(serializers.Serializer):
     """Сериалайзер для запроса токена."""
-    username = serializers.CharField(max_length=150, required=True)
+    username = serializers.CharField(
+        max_length=150, required=True, validators=[validate_username]
+    )
     confirmation_code = serializers.CharField(max_length=255, required=True)
 
 
@@ -47,13 +54,6 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             'username', 'email', 'first_name', 'last_name', 'bio', 'role'
         )
-
-    def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError(
-                'Использовать имя "me" в качестве username запрещено.'
-            )
-        return value
 
 
 class UserPatchMeSerializer(UserSerializer):

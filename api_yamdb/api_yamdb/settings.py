@@ -113,3 +113,5 @@ EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 admin_methods = ('POST', 'PATCH', 'PUT', 'DELETE',)
 moderator_methods = ('PATCH', 'PUT', 'DELETE',)
+
+ADMINS_EMAIL = 'from@api_yamdb.com'
