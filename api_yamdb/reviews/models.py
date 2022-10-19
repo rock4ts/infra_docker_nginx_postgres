@@ -41,7 +41,7 @@ class User(AbstractUser):
         blank=True, verbose_name='О себе'
     )
     role = models.CharField(
-        max_length=50, choices=USERS_ROLES, default='user', verbose_name='Роль'
+        max_length=50, choices=USERS_ROLES, default=USER, verbose_name='Роль'
     )
 
     class Meta:
