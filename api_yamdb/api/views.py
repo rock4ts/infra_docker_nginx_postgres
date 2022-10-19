@@ -1,5 +1,7 @@
+from ast import Mod
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, viewsets
@@ -10,10 +12,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api_yamdb.settings import admin_methods, ADMINS_EMAIL, moderator_methods
+from api_yamdb.settings import ADMINS_EMAIL
 from reviews.models import Category, Genre, Review, Title, User
 from .filters import TitleFilter
-from .permissions import IsAdminOrSuperUser, IsModeratorOrAdminOrOwner
+from .mixins import AdminViewMixin, ModeratorViewMixin
+from .permissions import IsAdminOrSuperUser
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, GetTitleSerializer,
                           ReviewSerializer, SignupSerializer, TitleSerializer,
@@ -76,9 +79,8 @@ class SignUpView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class TokenView(APIView):
+class TokenView(SignUpView):
     """Выдаёт токен по username и confirmation_code"""
-    permission_classes = (AllowAny,)
 
     def post(self, request):
         serializer = TokenSerializer(data=request.data)
@@ -95,7 +97,7 @@ class TokenView(APIView):
 
 class CategoryViewSet(
         mixins.CreateModelMixin, mixins.DestroyModelMixin,
-        mixins.ListModelMixin, viewsets.GenericViewSet):
+        mixins.ListModelMixin, AdminViewMixin):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = PageNumberPagination
@@ -104,24 +106,15 @@ class CategoryViewSet(
     lookup_field = 'slug'
     ordering = ('name',)
 
-    def get_permissions(self):
-        if self.request.method in admin_methods:
-            self.permission_classes = (IsAdminOrSuperUser,)
-        return super(CategoryViewSet, self).get_permissions()
-
 
 class GenreViewSet(CategoryViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
-    def get_permissions(self):
-        if self.request.method in admin_methods:
-            self.permission_classes = (IsAdminOrSuperUser,)
-        return super(GenreViewSet, self).get_permissions()
 
-
-class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all().select_related()
+class TitleViewSet(viewsets.ModelViewSet, AdminViewMixin):
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')).select_related()
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter,)
     filterset_class = TitleFilter
@@ -132,13 +125,8 @@ class TitleViewSet(viewsets.ModelViewSet):
             return GetTitleSerializer
         return TitleSerializer
 
-    def get_permissions(self):
-        if self.request.method in admin_methods:
-            self.permission_classes = (IsAdminOrSuperUser,)
-        return super(TitleViewSet, self).get_permissions()
 
-
-class ReviewViewSet(viewsets.ModelViewSet):
+class ReviewViewSet(viewsets.ModelViewSet, ModeratorViewMixin):
     serializer_class = ReviewSerializer
     pagination_class = PageNumberPagination
     filter_backends = (filters.OrderingFilter,)
@@ -148,11 +136,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, id=title_id)
         return title.reviews.all().select_related('author')
-
-    def get_permissions(self):
-        if self.request.method in moderator_methods:
-            self.permission_classes = (IsModeratorOrAdminOrOwner,)
-        return super(ReviewViewSet, self).get_permissions()
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
@@ -170,11 +153,6 @@ class CommentViewSet(ReviewViewSet):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(title.reviews, id=review_id)
         return review.comments.all().select_related('author')
-
-    def get_permissions(self):
-        if self.request.method in moderator_methods:
-            self.permission_classes = (IsModeratorOrAdminOrOwner,)
-        return super(CommentViewSet, self).get_permissions()
 
     def perform_create(self, serializer):
         review_id = self.kwargs.get('review_id')
