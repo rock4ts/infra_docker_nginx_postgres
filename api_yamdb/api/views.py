@@ -80,7 +80,7 @@ class SignUpView(APIView):
 
 class TokenView(SignUpView):
     """
-    Defines function that uses username and confirmation_code parameters 
+    Defines function that uses username and confirmation_code parameters
     and returns user token.
     """
 

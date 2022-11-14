@@ -136,8 +136,8 @@ class GenreTitle(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Title Genre'
-        verbose_name_plural = 'Title Genres'
+        verbose_name = 'Genre'
+        verbose_name_plural = 'Genres'
         constraints = [
             models.UniqueConstraint(
                 fields=['title', 'genre'],
