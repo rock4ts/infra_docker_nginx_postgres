@@ -1,6 +1,6 @@
 FROM python:3.7-slim
 
-WORKDIR /api_yamdb
+WORKDIR /app
 
 COPY requirements.txt .
 
@@ -11,6 +11,3 @@ COPY . .
 CMD ["gunicorn", "api_yamdb.wsgi:application", "--bind", "0:8000" ]
 
 LABEL author='rock4ts' version=1.1
-
-
-
