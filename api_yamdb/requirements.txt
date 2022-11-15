@@ -10,6 +10,7 @@ isort==5.10.1
 psycopg2-binary==2.8.6
 pytz==2020.1
 pytest-django==4.5.2
+pytest-pythonpath==0.7.3
 PyJWT==2.1.0
 requests==2.26.0
 sqlparse==0.3.1
