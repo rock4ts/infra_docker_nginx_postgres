@@ -55,6 +55,7 @@ DB_HOST=db
 DB_PORT=5432
 
 DEBUG=False
+SECRET_KEY=p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs # не меняйте, скопируйте как есть
 ```
 Для сборки образов и создания контейнеров выполните команду: 
 ```
